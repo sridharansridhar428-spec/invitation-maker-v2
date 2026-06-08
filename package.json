@@ -1,0 +1,28 @@
+{
+  "name": "invitation-maker-v2",
+  "version": "1.0.0",
+  "description": "A dynamic invitation generator built with Flask (Python backend) and JavaScript + CSS (frontend).",
+  "main": "index.js",
+  "scripts": {
+    "tailwind:init": "npx tailwindcss init",
+    "build:css": "npx tailwindcss -i ./static/style.css -o ./static/output.css --minify",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sridharansridhar428-spec/invitation-maker-v2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sridharansridhar428-spec/invitation-maker-v2/issues"
+  },
+  "homepage": "https://github.com/sridharansridhar428-spec/invitation-maker-v2#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^4.3.0"
+  }
+}

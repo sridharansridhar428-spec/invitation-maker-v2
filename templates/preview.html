@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Preview - {{ category }} Template {{ template_id }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white shadow-2xl rounded-xl p-10 w-full max-w-2xl text-center">
+    <!-- ✅ Heading now uses Category + Event For -->
+    <h1 class="text-3xl font-bold text-pink-600 mb-6">
+      {{ category }} Invitation for {{ invitation.event_for }}
+    </h1>
+
+    <div class="space-y-4 text-gray-700">
+      <p><strong>Date:</strong> {{ invitation.date }}</p>
+      <p><strong>Time:</strong> {{ invitation.time }}</p>
+      <p><strong>Venue:</strong> {{ invitation.venue }}</p>
+      <p><strong>Message:</strong> {{ invitation.message }}</p>
+      <p><strong>RSVP:</strong> {{ invitation.rsvp_email }}</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-8 flex justify-center gap-4">
+      <!-- ✅ Back button returns to editor -->
+      <a href="{{ url_for('editor', category=session['category'], template_id=session['template_id']) }}"
+         class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition">Back</a>
+
+      <a href="{{ url_for('download_pdf') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 transition">Download PDF</a>
+      <a href="{{ url_for('download_png') }}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition">Download PNG</a>
+      <a href="{{ url_for('send_email') }}" class="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-800 transition">Send via Email</a>
+    </div>
+  </div>
+
+</body>
+</html>

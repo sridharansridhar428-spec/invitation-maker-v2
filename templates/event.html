@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ category }} Templates - Invitation Maker v2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 min-h-screen flex flex-col items-center justify-center">
+
+  <div class="bg-white shadow-2xl rounded-xl p-10 w-full max-w-5xl">
+    <h1 class="text-3xl font-bold text-center text-purple-600 mb-6">
+      {{ category }} Invitation Templates
+    </h1>
+    <p class="text-center text-gray-600 mb-8">
+      Choose a template below to customize your {{ category }} invitation.
+    </p>
+
+    <!-- Gallery Grid -->
+    <div class="grid grid-cols-3 gap-6">
+      <!-- Template Card -->
+      <div class="bg-gray-100 rounded-lg shadow hover:shadow-xl transition p-4">
+        <img src="https://via.placeholder.com/300x200" alt="Template 1" class="rounded-lg mb-4">
+        <h2 class="text-lg font-semibold text-center">Template 1</h2>
+        <div class="text-center mt-4">
+          <a href="/editor/{{ category }}/1" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-800 transition">Customize</a>
+        </div>
+      </div>
+
+      <div class="bg-gray-100 rounded-lg shadow hover:shadow-xl transition p-4">
+        <img src="https://via.placeholder.com/300x200" alt="Template 2" class="rounded-lg mb-4">
+        <h2 class="text-lg font-semibold text-center">Template 2</h2>
+        <div class="text-center mt-4">
+          <a href="/editor/{{ category }}/2" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-800 transition">Customize</a>
+        </div>
+      </div>
+
+      <div class="bg-gray-100 rounded-lg shadow hover:shadow-xl transition p-4">
+        <img src="https://via.placeholder.com/300x200" alt="Template 3" class="rounded-lg mb-4">
+        <h2 class="text-lg font-semibold text-center">Template 3</h2>
+        <div class="text-center mt-4">
+          <a href="/editor/{{ category }}/3" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-800 transition">Customize</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-8">
+      <a href="/dashboard" class="text-purple-600 font-semibold hover:underline">Back to Dashboard</a>
+    </div>
+  </div>
+
+</body>
+</html>

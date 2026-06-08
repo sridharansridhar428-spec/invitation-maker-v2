@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Editor - {{ category }} Template {{ template_id }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white shadow-2xl rounded-xl p-10 w-full max-w-5xl">
+    <h1 class="text-3xl font-bold text-center text-indigo-600 mb-6">
+      Customize Your {{ category }} Invitation
+    </h1>
+
+    <form action="/editor/{{ category }}/{{ template_id }}" method="POST" class="grid grid-cols-2 gap-8">
+      <!-- Left: Form Fields -->
+      <div class="space-y-4">
+        <div>
+          <label class="block text-gray-700 font-semibold">Event For</label>
+          <input type="text" name="event_for" placeholder="e.g. Amee’s Birthday"
+                 value="{{ invitation.event_for or '' }}"
+                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-gray-700 font-semibold">Date</label>
+          <input type="date" name="date"
+                 value="{{ invitation.date or '' }}"
+                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-gray-700 font-semibold">Time</label>
+          <input type="time" name="time"
+                 value="{{ invitation.time or '' }}"
+                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-gray-700 font-semibold">Venue</label>
+          <input type="text" name="venue" placeholder="e.g. Grand Palace Hall"
+                 value="{{ invitation.venue or '' }}"
+                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-gray-700 font-semibold">Message</label>
+          <textarea name="message" rows="4" placeholder="Write a short message..."
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">{{ invitation.message or '' }}</textarea>
+        </div>
+        <div>
+          <label class="block text-gray-700 font-semibold">RSVP Email</label>
+          <input type="email" name="rsvp_email" placeholder="e.g. example@gmail.com"
+                 value="{{ invitation.rsvp_email or '' }}"
+                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+        </div>
+
+        <!-- ✅ Buttons section -->
+        <div class="flex justify-between items-center mt-6">
+          <button type="submit"
+                  class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-800 transition">
+            Preview Invitation
+          </button>
+          <a href="{{ url_for('dashboard') }}"
+             class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition">
+             ← Back
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Live Preview -->
+      <div class="bg-gray-50 rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold text-center mb-4 text-indigo-600">Live Preview</h2>
+        <div id="preview" class="text-center space-y-3 text-gray-700">
+          <h3 class="text-2xl font-semibold text-purple-600" id="preview-heading">
+            {{ category }} Invitation for {{ invitation.event_for or 'Someone Special' }}
+          </h3>
+          <p><strong>Date:</strong> <span id="preview-date">{{ invitation.date or 'YYYY-MM-DD' }}</span></p>
+          <p><strong>Time:</strong> <span id="preview-time">{{ invitation.time or 'HH:MM' }}</span></p>
+          <p><strong>Venue:</strong> <span id="preview-venue">{{ invitation.venue or 'Venue Name' }}</span></p>
+          <p><strong>Message:</strong> <span id="preview-message">{{ invitation.message or 'Your message here...' }}</span></p>
+          <p><strong>RSVP:</strong> <span id="preview-rsvp_email">{{ invitation.rsvp_email or 'example@gmail.com' }}</span></p>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Live Preview Script -->
+  <script>
+    const fields = ['event_for','date','time','venue','message','rsvp_email'];
+    fields.forEach(f => {
+      document.querySelector(`[name=${f}]`).addEventListener('input', e => {
+        document.getElementById(`preview-${f}`).innerText = e.target.value || `Your ${f}`;
+      });
+    });
+
+    document.querySelector('[name=event_for]').addEventListener('input', e => {
+      document.getElementById('preview-heading').innerText =
+        `{{ category }} Invitation for ${e.target.value || 'Someone Special'}`;
+    });
+  </script>
+
+</body>
+</html>
