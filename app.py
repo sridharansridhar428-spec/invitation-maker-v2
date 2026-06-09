@@ -192,17 +192,13 @@ def send_email():
     pdf_bytes = pdf.output(dest='S').encode('latin1')
 
     # SendGrid API request
-    import requests
-    data = {
-        "personalizations": [{"to": [{"email": recipient}]}],
-        "from": {"email": "your_verified_sender@example.com"},
-        "subject": f"{session.get('category','')} Invitation for {invitation.get('event_for','')}",
-        "content": [{"type": "text/html", "value": html_body}],
-        "attachments": [{
-            "content": pdf_bytes.decode('latin1'),
-            "type": "application/pdf",
-            "filename": "invitation.pdf"
-        }]
+    import base64
+
+"attachments": [{
+    "content": base64.b64encode(pdf_bytes).decode("utf-8"),
+    "type": "application/pdf",
+    "filename": "invitation.pdf"
+}]
     }
 
     response = requests.post(
