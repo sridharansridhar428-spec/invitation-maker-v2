@@ -162,11 +162,11 @@ def send_email():
         return redirect(url_for('login'))
 
     invitation = session.get('invitation', {})
-    sender = os.environ.get("MAIL_USERNAME")
     recipient = invitation.get('rsvp_email', "").strip()
+    api_key = os.environ.get("SENDGRID_API_KEY")
 
-    if not sender or not os.environ.get("MAIL_PASSWORD"):
-        return "Email not configured. Please set MAIL_USERNAME and MAIL_PASSWORD."
+    if not api_key:
+        return "SendGrid API key not configured."
 
     # Styled HTML body
     html_body = f"""
@@ -184,28 +184,35 @@ def send_email():
     </html>
     """
 
-    msg = MIMEMultipart()
-    msg["Subject"] = f"{session.get('category','')} Invitation for {invitation.get('event_for','')}"
-    msg["From"] = sender
-    msg["To"] = recipient
-    msg.attach(MIMEText(html_body, "html"))
-
-    # Attach PDF
+    # Generate PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=14)
     pdf.cell(200, 10, txt=f"Invitation for {invitation.get('event_for','')}", ln=True, align="C")
     pdf_bytes = pdf.output(dest='S').encode('latin1')
-    msg.attach(MIMEApplication(pdf_bytes, _subtype="pdf", Name="invitation.pdf"))
 
-    try:
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.starttls()
-            server.login(sender, os.environ.get("MAIL_PASSWORD"))
-            server.sendmail(sender, recipient, msg.as_string())
-        return "Email sent successfully with styled body and PDF attachment!"
-    except Exception as e:
-        return f"Error sending email: {e}"
+    # SendGrid API request
+    import requests
+    data = {
+        "personalizations": [{"to": [{"email": recipient}]}],
+        "from": {"email": "your_verified_sender@example.com"},
+        "subject": f"{session.get('category','')} Invitation for {invitation.get('event_for','')}",
+        "content": [{"type": "text/html", "value": html_body}],
+        "attachments": [{
+            "content": pdf_bytes.decode('latin1'),
+            "type": "application/pdf",
+            "filename": "invitation.pdf"
+        }]
+    }
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    response = requests.post(
+        "https://api.sendgrid.com/v3/mail/send",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        },
+        json=data
+    )
+
+    return "Email sent successfully!" if response.status_code == 202 else f"Error: {response.text}"
+
