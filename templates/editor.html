@@ -5,7 +5,12 @@
   <title>Editor - {{ category }} Template {{ template_id }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center">
+<body class="min-h-screen flex items-center justify-center
+             {% if category == 'Wedding' %}bg-gradient-to-r from-pink-200 via-pink-400 to-pink-600
+             {% elif category == 'Birthday' %}bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-600
+             {% elif category == 'Party' %}bg-gradient-to-r from-green-200 via-green-400 to-green-600
+             {% elif category == 'Corporate' %}bg-gradient-to-r from-blue-200 via-blue-400 to-blue-600
+             {% else %}bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500{% endif %}">
 
   <div class="bg-white shadow-2xl rounded-xl p-10 w-full max-w-5xl">
     <h1 class="text-3xl font-bold text-center text-indigo-600 mb-6">
@@ -15,35 +20,47 @@
     <form action="/editor/{{ category }}/{{ template_id }}" method="POST" class="grid grid-cols-2 gap-8">
       <!-- Left: Form Fields -->
       <div class="space-y-4">
+        <!-- Event For -->
         <div>
           <label class="block text-gray-700 font-semibold">Event For</label>
-          <input type="text" name="event_for" placeholder="e.g. Amee’s Birthday"
+          <input type="text" name="event_for"
+                 placeholder="{% if category == 'Wedding' %}e.g. Ram & Sita's Wedding{% elif category == 'Birthday' %}e.g. Will's Birthday{% elif category == 'Party' %}e.g. RDJ's Graduation Party{% elif category == 'Corporate' %}e.g. Annual Corporate Meetup{% else %}e.g. Special Event{% endif %}"
                  value="{{ invitation.event_for or '' }}"
                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">
         </div>
+
+        <!-- Date -->
         <div>
           <label class="block text-gray-700 font-semibold">Date</label>
           <input type="date" name="date"
                  value="{{ invitation.date or '' }}"
                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">
         </div>
+
+        <!-- Time -->
         <div>
           <label class="block text-gray-700 font-semibold">Time</label>
           <input type="time" name="time"
                  value="{{ invitation.time or '' }}"
                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">
         </div>
+
+        <!-- Venue -->
         <div>
           <label class="block text-gray-700 font-semibold">Venue</label>
           <input type="text" name="venue" placeholder="e.g. Grand Palace Hall"
                  value="{{ invitation.venue or '' }}"
                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">
         </div>
+
+        <!-- Message -->
         <div>
           <label class="block text-gray-700 font-semibold">Message</label>
           <textarea name="message" rows="4" placeholder="Write a short message..."
                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">{{ invitation.message or '' }}</textarea>
         </div>
+
+        <!-- RSVP Email -->
         <div>
           <label class="block text-gray-700 font-semibold">RSVP Email</label>
           <input type="email" name="rsvp_email" placeholder="e.g. example@gmail.com"
@@ -51,7 +68,7 @@
                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none">
         </div>
 
-        <!-- ✅ Buttons section -->
+        <!-- Buttons -->
         <div class="flex justify-between items-center mt-6">
           <button type="submit"
                   class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-800 transition">
