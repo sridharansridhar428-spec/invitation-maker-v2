@@ -58,9 +58,7 @@ def signup():
             conn.close()
             return "Email already registered. Please log in instead."
         else:
-            cursor.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, hashed_password))
-            conn.commit()
-            conn.close()
+           cursor.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, hashed_password))
             return redirect(url_for('login'))
 
     return render_template('signup.html')
@@ -69,17 +67,21 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form['email'].strip()
+        password = request.form['password'].strip()
 
         conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
         conn.close()
 
-        if user and check_password_hash(user[2], password):  # user[2] = password column
-            session['user'] = user[1]  # user[1] = email column
+        # 👇 Add these debug prints here
+        print("User row:", user)
+        print("Hash check:", check_password_hash(user['password'], password) if user else None)
+
+        if user and check_password_hash(user['password'], password):
+            session['user'] = user['email']
             return redirect(url_for('dashboard'))
         else:
             return "Invalid email or password. Please try again."
@@ -154,7 +156,6 @@ def download_pdf():
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     pdf_output = io.BytesIO(pdf_bytes)
     return send_file(pdf_output, as_attachment=True, download_name="invitation.pdf")
-
 # ✅ Send Email route
 @app.route('/send_email')
 def send_email():
@@ -163,7 +164,16 @@ def send_email():
 
     invitation = session.get('invitation', {})
     recipient = invitation.get('rsvp_email', "").strip()
-    api_key = os.environ.get("SENDGRID_API_KEY")
+
+    # ✅ Validate recipient email
+    if not recipient or "@" not in recipient:
+        return "Error: Please provide a valid RSVP email address."
+
+    # ✅ Strip whitespace from API key
+    api_key = os.environ.get("SENDGRID_API_KEY", "").strip()
+
+    # Debugging line — shows the exact string being loaded
+    print(f"API key loaded: {repr(api_key)}")
 
     if not api_key:
         return "SendGrid API key not configured."
@@ -205,13 +215,19 @@ def send_email():
         }]
     }
 
+    # ✅ Clean headers
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+
     response = requests.post(
         "https://api.sendgrid.com/v3/mail/send",
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        },
+        headers=headers,
         json=data
     )
+
+    # Debugging line — shows SendGrid response
+    print(f"SendGrid response: {response.status_code}, {response.text}")
 
     return "Email sent successfully!" if response.status_code == 202 else f"Error: {response.text}"
