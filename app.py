@@ -178,6 +178,9 @@ def send_email():
     if not api_key:
         return "SendGrid API key not configured."
 
+    # Plain text version for spam filter compliance
+    text_body = f"Invitation for {invitation.get('event_for','')}. Date: {invitation.get('date','')}, Venue: {invitation.get('venue','')}. RSVP: {invitation.get('rsvp_email','')}"
+
     # Styled HTML body
     html_body = f"""
     <html>
@@ -194,20 +197,26 @@ def send_email():
     </html>
     """
 
-    # Generate PDF
+    # Generate PDF safely as a byte string
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=14)
     pdf.cell(200, 10, txt=f"Invitation for {invitation.get('event_for','')}", ln=True, align="C")
-    pdf_bytes = pdf.output(dest='S').encode('latin1')
+    
+    # Safe multi-version PDF byte extraction
+    pdf_output = pdf.output(dest='S')
+    pdf_bytes = pdf_output if isinstance(pdf_output, bytes) else pdf_output.encode('latin1')
 
     # SendGrid API request
     import base64, requests
     data = {
         "personalizations": [{"to": [{"email": recipient}]}],
-        "from": {"email": "your_verified_sender@example.com"},
+        "from": {"email": "sridharansridhar428@gmail.com"},
         "subject": f"{session.get('category','')} Invitation for {invitation.get('event_for','')}",
-        "content": [{"type": "text/html", "value": html_body}],
+        "content": [
+            {"type": "text/plain", "value": text_body},
+            {"type": "text/html", "value": html_body}
+        ],
         "attachments": [{
             "content": base64.b64encode(pdf_bytes).decode("utf-8"),
             "type": "application/pdf",
