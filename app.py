@@ -44,7 +44,7 @@ def home():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        email = request.form['email']
+        email = request.form['email'].strip()
         password = request.form['password']
         hashed_password = generate_password_hash(password)
 
@@ -58,7 +58,9 @@ def signup():
             conn.close()
             return "Email already registered. Please log in instead."
         else:
-           cursor.execute("INSERT INTO users (email, password) VALUES (%s, %s)", (email, hashed_password))
+            cursor.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, hashed_password))
+            conn.commit()
+            conn.close()
             return redirect(url_for('login'))
 
     return render_template('signup.html')
@@ -71,13 +73,13 @@ def login():
         password = request.form['password'].strip()
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
         user = cursor.fetchone()
         conn.close()
 
-        # 👇 Add these debug prints here
-        print("User row:", user)
+        # Debug prints
+        print("User row:", dict(user) if user else None)
         print("Hash check:", check_password_hash(user['password'], password) if user else None)
 
         if user and check_password_hash(user['password'], password):
@@ -156,6 +158,7 @@ def download_pdf():
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     pdf_output = io.BytesIO(pdf_bytes)
     return send_file(pdf_output, as_attachment=True, download_name="invitation.pdf")
+
 # ✅ Send Email route
 @app.route('/send_email')
 def send_email():
@@ -240,3 +243,6 @@ def send_email():
     print(f"SendGrid response: {response.status_code}, {response.text}")
 
     return "Email sent successfully!" if response.status_code == 202 else f"Error: {response.text}"
+
+if __name__ == "__main__":
+    app.run(debug=True)
